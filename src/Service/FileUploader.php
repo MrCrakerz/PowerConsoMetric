@@ -18,7 +18,7 @@ class FileUploader
     {
         try {
 
-            $file->move($uploadDir, $filename);
+            $file->move($uploadDir, "bd.json");
         } catch (FileException $e){
 
             $this->logger->error('failed to upload image: ' . $e->getMessage());
