@@ -8,6 +8,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Service\FileUploader;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
+use App\Entity\Mesure;
+use Doctrine\Persistence\ObjectManager;
 
 class UploadController extends AbstractController
 {
@@ -22,6 +29,16 @@ class UploadController extends AbstractController
     public function index(Request $request, string $uploadDir,
                           FileUploader $uploader, LoggerInterface $logger): Response
     {
+        $finder = new Finder();
+        $dossier = '../var/uploads';
+        $ouverture=opendir($dossier);
+        $fichier=readdir($ouverture);
+        $fichier=readdir($ouverture);
+        while ($fichier=readdir($ouverture)) {
+        unlink("$dossier/$fichier");
+        }
+        closedir($ouverture);
+
         $token = $request->get("token");
 
         if (!$this->isCsrfTokenValid('upload', $token))
@@ -43,7 +60,39 @@ class UploadController extends AbstractController
         $filename = $file->getClientOriginalName();
         $uploader->upload($uploadDir, $file, $filename);
 
-        return new Response("File uploaded",  Response::HTTP_OK,
-            ['content-type' => 'text/plain']);
+
+        $objets = json_decode(file_get_contents('../var/uploads/bd.json'));
+
+        $nomMesureGlobale="Consommation Globale";
+        $consoMesureGlobale=0.0;
+        $dureeMesureGlobale=0;
+
+
+        foreach ($objets as $data) {
+              $hote = $data->host;
+              $consommateurs = $data->consumers;
+              if (isset($hote->consumption))
+              {
+              $consoMesureGlobale=$consoMesureGlobale+$hote->consumption;
+              }
+              if (isset($hote->timestamp))
+              $dureeMesureGlobale=$dureeMesureGlobale+$hote->timestamp;
+
+              $consommateurs = $data->consumers;
+              $tableauConso = Array();
+              foreach ($consommateurs as $consommateur) {
+                $tableauConso=$tableauConso+Array(
+                    $consommateur->exe=> array (
+                      $consommateur->exe,
+                      $consommateur->consumption,
+                      $consommateur->timestamp,
+                    )
+                  );
+
+
+              }
+        }
+
+        return $this->render('home/dashboard.html.twig',['nomMesureGlobale'=>$nomMesureGlobale,'consoMesureGlobale'=>$consoMesureGlobale,'dureeMesureGlobale'=>$dureeMesureGlobale,'tabConso'=>$tableauConso],);
     }
 }
