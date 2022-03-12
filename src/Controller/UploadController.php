@@ -83,14 +83,14 @@ class UploadController extends AbstractController
               foreach ($consommateurs as $consommateur) {
                 $tableauConso=$tableauConso+Array(
                     $consommateur->exe=> array (
-                      $consommateur->exe,
-                      $consommateur->consumption,
-                      $consommateur->timestamp,
+                      'nom'=>$consommateur->exe,
+                      'conso'=>$consommateur->consumption,
+                      'duree'=>$consommateur->timestamp,
                     )
                   );
-
-
               }
+              $json = json_encode($tableauConso);
+$bytes = file_put_contents("../var/uploads/verif.json", $json);
         }
 
         return $this->render('home/dashboard.html.twig',['nomMesureGlobale'=>$nomMesureGlobale,'consoMesureGlobale'=>$consoMesureGlobale,'dureeMesureGlobale'=>$dureeMesureGlobale,'tabConso'=>$tableauConso],);

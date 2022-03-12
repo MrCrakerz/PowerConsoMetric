@@ -13,5 +13,11 @@
     <h1>{{ consoMesureGlobale }} ✅</h1><br>
     <h1>{{ dureeMesureGlobale }} ✅</h1><br>
 </div>
-
+{% for mesure in tabConso %}
+    <div class="span4">
+        <h2>{{ mesure.nom }}</h2>
+        <h2>{{ mesure.conso }}</h2>
+        <h2>{{ mesure.duree }}</h2>
+    </div>
+{% endfor %}
 {% endblock %}
