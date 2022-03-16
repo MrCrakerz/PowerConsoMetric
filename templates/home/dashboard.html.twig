@@ -8,16 +8,40 @@
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
 </style>
 
-<div class="example-wrapper">
-    <h1>{{ nomMesureGlobale }} ✅</h1><br>
-    <h1>{{ consoMesureGlobale }} ✅</h1><br>
-    <h1>{{ dureeMesureGlobale }} ✅</h1><br>
-</div>
-{% for mesure in tabConso %}
-    <div class="span4">
-        <h2>{{ mesure.nom }}</h2>
-        <h2>{{ mesure.conso }}</h2>
-        <h2>{{ mesure.duree }}</h2>
-    </div>
-{% endfor %}
+<head>
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <script>
+  google.charts.load('current', {packages: ['corechart', 'line']});
+  google.charts.setOnLoadCallback(drawBackgroundColor);
+
+function drawBackgroundColor() {
+      var data = new google.visualization.DataTable();
+      data.addColumn('number', 'X');
+      data.addColumn('number', 'Dogs');
+
+      data.addRows([
+          {%for mesure in tableauHote%}
+        [{{mesure.date}}, {{mesure.conso}}],
+        {%endfor%}
+      ]);
+
+      var options = {
+        hAxis: {
+          title: 'Time'
+        },
+        vAxis: {
+          title: 'Popularity'
+        },
+        backgroundColor: '#f1f8e9'
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    }
+  </script>
+</head>
+<body>
+  <div id="chart_div"class="example-wrapper">
+  </div>
+</body>
 {% endblock %}
