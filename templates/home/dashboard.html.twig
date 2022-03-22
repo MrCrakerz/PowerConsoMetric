@@ -9,19 +9,62 @@
 </style>
 
 <head>
-  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script>
-  google.charts.load('current', {packages: ['corechart', 'line']});
-  google.charts.setOnLoadCallback(drawBackgroundColor);
+  {%set mesurePrec = ''%}
+  var nomFonctionPrec='';
+  var mesureTotale = 0;
+  var derniereMesure = 0;
+  var boolPremiereMesure =0;
+  var premiereMesure =0;
+  var différenceTmps=0;
+  var consoTotale;
 
-function drawBackgroundColor() {
+  google.charts.load('current', {packages: ['corechart', 'line']});
+  google.charts.setOnLoadCallback(drawBackgroundColor)
+
+
+  function timeConverter(UNIX_timestamp){
+    var a = new Date(UNIX_timestamp * 1000);
+    var hour = a.getHours();
+    var min = a.getMinutes();
+    var sec = a.getSeconds();
+    var time = hour + ':' + min + ':' + sec ;
+    return time;
+  }
+
+/*  function drawChart(nomMesure, consoMesure)
+   {
+            // Define the chart to be drawn.
+            var data = google.visualization.arrayToDataTable([
+               ['Year', 'Asia'],
+               ['2012',  900],
+               ['2013',  1000],
+               ['2014',  1170],
+               ['2015',  1250],
+               ['2016',  1530]
+            ]);
+
+            var options = {title: 'Population (in millions)'};
+
+            // Instantiate and draw the chart.
+            var chart = new google.visualization.ColumnChart(document.getElementById(nomMesure));
+            chart.draw(data, options);
+         }
+
+         google.charts.setOnLoadCallback(drawChart);
+*/
+
+function drawBackgroundColor()
+{
       var data = new google.visualization.DataTable();
-      data.addColumn('number', 'X');
+      data.addColumn('string', 'X');
       data.addColumn('number', 'Dogs');
 
       data.addRows([
           {%for mesure in tableauHote%}
-        [{{mesure.date}}, {{mesure.conso}}],
+        [timeConverter({{mesure.date}}),Math.pow(10,-6)*{{mesure.conso}}],
         {%endfor%}
       ]);
 
@@ -30,18 +73,102 @@ function drawBackgroundColor() {
           title: 'Time'
         },
         vAxis: {
-          title: 'Popularity'
+          title: 'Puissance (watts)'
         },
         backgroundColor: '#f1f8e9'
       };
 
       var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
       chart.draw(data, options);
+}
+
+function determinerAffichage (nomMesure, consoMesure, dateMesure)
+      {
+        if (nomFonctionPrec=="")
+        {
+          nomFonctionPrec=nomMesure;
+        }
+        else{}
+        if(nomMesure==nomFonctionPrec)
+        {
+          if(boolPremiereMesure==0)
+          {
+            premiereMesure=dateMesure;
+            boolPremiereMesure=1;
+          }
+          mesureTotale= mesureTotale + consoMesure;
+          derniereMesure = dateMesure;
+        }
+        else {
+          {
+
+              différenceTmps = (derniereMesure-premiereMesure);
+              alert(nomMesure+" : "+mesureTotale*Math.pow(10,-6));
+              consoTotale =mesureTotale*Math.pow(10,-6)*différenceTmps;
+              config = determinerVariables(nomMesure, consoTotale);
+              const myChart = new Chart (document.getElementById(nomMesure+'1'),config);
+              nomFonctionPrec='';
+              mesureTotale = 0;
+              derniereMesure = 0;
+              boolPremiereMesure =0;
+              premiereMesure =0;
+              différenceTmps=0;
+          }
+        }
+      }
+function determinerVariables (nomAppli,consoAppli)
+{
+
+const data = {
+  labels: '  ',
+  datasets: [{
+    label: nomAppli,
+    data: [consoAppli],
+    backgroundColor: [
+      'rgba(255, 99, 132, 0.2)'
+    ],
+    borderColor: [
+      'rgb(255, 99, 132)'
+    ],
+    borderWidth: 1
+  }]
+};
+
+const config = {
+type: 'bar',
+data: data,
+options: {
+  scales: {
+    y: {
+      beginAtZero: true
+      }
     }
+  },
+};
+return config;
+}
+
   </script>
+
 </head>
 <body>
   <div id="chart_div"class="example-wrapper">
   </div>
+  <div id="container">
+  </div>
+  {% for mesure in tableauFinal %}
+
+  {% if mesure.name != mesurePrec %}
+  <div id={{mesure.name}}>
+    <canvas id="{{mesure.name}}1"></canvas>
+  </div>
+  {% set mesurePrec = mesure.name %}
+  {% endif %}
+
+
+  <script>
+  determinerAffichage("{{mesure.name}}",{{mesure.conso}}, {{mesure.heure}});
+  </script>
+  {% endfor %}
 </body>
 {% endblock %}

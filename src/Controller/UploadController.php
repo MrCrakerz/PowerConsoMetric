@@ -81,11 +81,23 @@ class UploadController extends AbstractController
         foreach ($objets as $mesure) {
           $consommateurs = $mesure->consumers;
           foreach ($consommateurs as $consommateur) {
-            $tableauConso= array_merge($tableauConso, array (
-                $compteurNuméroMesure=>$consommateur->exe,
-            )
-          );
-            $compteurNuméroMesure++;
+            $compteurTaille = 0;
+            foreach ($tableauConso as $consommateursDansTableau)
+             {
+               if ($consommateursDansTableau!=$consommateur->exe)
+               {
+                 $compteurTaille ++;
+               }
+            }
+            if ($compteurTaille == sizeof($tableauConso))
+            {
+              $tableauConso= array_merge($tableauConso, array (
+                  $compteurNuméroMesure=>$consommateur->exe,
+              )
+            );
+              $compteurNuméroMesure++;
+            }
+
           }
         }
         $tableauFinal =array();
@@ -110,6 +122,8 @@ class UploadController extends AbstractController
 
         $json = json_encode($tableauHote);
         $bytes = file_put_contents("../var/uploads/verif.json", $json);
+        $json = json_encode($tableauConso);
+        $bytes = file_put_contents("../var/uploads/verif3.json", $json);
         $json = json_encode($tableauFinal);
         $bytes = file_put_contents("../var/uploads/verif2.json", $json);
 
