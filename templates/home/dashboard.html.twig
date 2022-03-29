@@ -81,7 +81,7 @@ function drawBackgroundColor()
     {%endfor%}
     mesureTotale = mesureToale*Math.pow(10,-3);
     moyenneHost = mesureTotale/compteurHost;
-    document.getElementById("hostConsoMoyenne").innerHTML = ("Moyenne de la consommation instantané globale : " + moyenneHost +" MilliWatts.");
+    document.getElementById("hostConsoMoyenne").innerHTML = moyenneHost;
 
       var options = {
         hAxis: {
@@ -126,10 +126,11 @@ function determinerAffichage (nomMesure, consoMesure, dateMesure)
                 //mesureTotale = Math.round(mesureTotale*10000)/10000;
                 //alert(nomFonctionPrec+" : "+mesureTotale+" "+différenceTmps);
 
-                consoTotale =mesureTotale*différenceTmps;
+                consoTotale =mesureTotale*différenceTmps/compteurMoyenne;
 
                 consoMoyenne= mesureTotale/compteurMoyenne;
                 document.getElementById(nomFonctionPrec+'Moyenne').innerHTML = ("Moyenne de la consommation pour le processus " + nomFonctionPrec+" : " + consoMoyenne*Math.pow(10,3) +" MilliWatts.");
+
                 /*tableauMoyenne= tableauMoyenne + {
                   compteurMesureMoyenneActuelle:{
                     "nom":nomFonctionPrec,
@@ -156,7 +157,6 @@ function determinerAffichage (nomMesure, consoMesure, dateMesure)
               boolPremiereMesure =0;
               premiereMesure =0;
               différenceTmps=0;
-
           }
 
         }
@@ -206,21 +206,38 @@ options: {
 };
 return config;
 }
-
+function calculerExportationHote()
+{
+  valeurMoyenne = Number(document.getElementById('hostConsoMoyenne').textContent);
+  alert ('valMoy : ' + valeurMoyenne);
+  valeurMoyenne = valeurMoyenne*Math.pow(10,-3);
+  nbHeure = document.getElementById('heures').value;
+  alert ('nbHeure : ' + nbHeure);
+  nbJours = document.getElementById('nbJours').value;
+  alert (' nbJours ' + nbJours);
+  valExport = valeurMoyenne * nbHeure * nbJours;
+  alert (' ValeExpor : ' + valExport);
+  document.getElementById('resultat').innerHTML=valExport;
+}
   </script>
 
 </head>
 <body>
+  <form id = "hostFormulaire">
   <div id="chart_div"class="example-wrapper">
 
   </div>
-<label id="hostConsoMoyenne"></label><br>
+<label> Moyenne de la consommation instantané globale : </label>
+<label type=number id="hostConsoMoyenne"></label>
+<label> MilliWatts </label> <br>
 <label> Exportation :     Nombre d'heures par jour </label>
 <input type="number" id="heures">
 <label>  Sur : </label>
 <input type="number" id="nbJours">
 <label>  par an.   </label>
   <label id="resultat"></label>
+  <input type = 'button' value="calculer" onclick= "calculerExportationHote()">
+</form>
   {% for mesure in tableauFinal %}
 
   {% if mesure.name != mesurePrec %}
