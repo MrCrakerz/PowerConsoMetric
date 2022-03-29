@@ -12,6 +12,9 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script>
+  var tableauMoyenne = {};
+  var compteurMoyenne = 0;
+  var compteurMesureMoyenneActuelle = 1;
   {%set mesurePrec = ''%}
   var nomFonctionPrec='';
   var mesureTotale = 0;
@@ -24,7 +27,11 @@
   google.charts.load('current', {packages: ['corechart', 'line']});
   google.charts.setOnLoadCallback(drawBackgroundColor)
 
-
+  function removeSpecialChars(str) {
+    return str.replace(/(?!\w|\s)./g, '')
+      .replace(/\s+/g, ' ')
+      .replace(/^(\s*)([\W\w]*)(\b\s*$)/g, '$2');
+  }
   function timeConverter(UNIX_timestamp){
     var a = new Date(UNIX_timestamp * 1000);
     var hour = a.getHours();
@@ -60,13 +67,21 @@ function drawBackgroundColor()
 {
       var data = new google.visualization.DataTable();
       data.addColumn('string', 'X');
-      data.addColumn('number', 'Dogs');
+      data.addColumn('number', 'Consommation');
 
       data.addRows([
           {%for mesure in tableauHote%}
         [timeConverter({{mesure.date}}),Math.pow(10,-6)*{{mesure.conso}}],
         {%endfor%}
       ]);
+      compteurHost = 0;
+      {%for mesure in tableauHote%}
+      mesureToale = mesureTotale + {{mesure.conso}};
+      compteurHost ++;
+    {%endfor%}
+    mesureTotale = mesureToale*Math.pow(10,-3);
+    moyenneHost = mesureTotale/compteurHost;
+    document.getElementById("hostConsoMoyenne").innerHTML = ("Moyenne de la consommation instantané globale : " + moyenneHost +" MilliWatts.");
 
       var options = {
         hAxis: {
@@ -84,9 +99,11 @@ function drawBackgroundColor()
 
 function determinerAffichage (nomMesure, consoMesure, dateMesure)
       {
+        //nomMesure = removeSpecialChars(nomMesure);
         if (nomFonctionPrec=="")
         {
           nomFonctionPrec=nomMesure;
+          compteurMoyenne=1;
         }
         if(nomMesure==nomFonctionPrec)
         {
@@ -97,6 +114,7 @@ function determinerAffichage (nomMesure, consoMesure, dateMesure)
           }
           else {
             derniereMesure = dateMesure;
+            compteurMoyenne++;
           }
           mesureTotale= mesureTotale + consoMesure;
 
@@ -108,7 +126,18 @@ function determinerAffichage (nomMesure, consoMesure, dateMesure)
                 //mesureTotale = Math.round(mesureTotale*10000)/10000;
                 //alert(nomFonctionPrec+" : "+mesureTotale+" "+différenceTmps);
 
-                consoTotale =mesureTotale*Math.pow(10,-6)*différenceTmps;
+                consoTotale =mesureTotale*différenceTmps;
+
+                consoMoyenne= mesureTotale/compteurMoyenne;
+                document.getElementById(nomFonctionPrec+'Moyenne').innerHTML = ("Moyenne de la consommation pour le processus " + nomFonctionPrec+" : " + consoMoyenne*Math.pow(10,3) +" MilliWatts.");
+                /*tableauMoyenne= tableauMoyenne + {
+                  compteurMesureMoyenneActuelle:{
+                    "nom":nomFonctionPrec,
+                    "consoMoyenne":consoMoyenne
+                  }
+                };*/
+
+
                 if (consoTotale > 0)
                 {
                   config = determinerVariables(nomFonctionPrec, consoTotale);
@@ -119,35 +148,38 @@ function determinerAffichage (nomMesure, consoMesure, dateMesure)
                   document.getElementById(nomFonctionPrec+'Label').innerHTML = ("Pas de mesures significatives pour le processus : " + nomFonctionPrec);
                 }
 
-
+              compteurMesureMoyenneActuelle;
+              compteurMoyenne = 0 ;
               nomFonctionPrec=nomMesure;
               mesureTotale = 0;
               derniereMesure = 0;
               boolPremiereMesure =0;
               premiereMesure =0;
               différenceTmps=0;
+
           }
+
         }
 function determinerVariables (nomAppli,consoAppli)
 {
 
-if (consoAppli<100)
+if (consoAppli<1)
 {
-  if(consoAppli < 1)
-  {
-    grandeur = "MicroWattsHeure"
-    consoAppli = consoAppli*1000000;
-  }
-  else
-  {
-    grandeur = "MilliWattsHeure"
-    consoAppli = consoAppli*1000;
-  }
+  grandeur = "MilliWattsHeure"
+  consoAppli = consoAppli*1000;
 
+}
+else if (consoAppli > 1000) {
+
+  grandeur = "KiloWattsHeure"
+  consoAppli = consoAppli/1000;
+}
+else {
+  grandeur = "WattsHeure"
 }
 
 const data = {
-  labels: ["WattsHeure"],
+  labels: [grandeur],
   datasets: [{
     label: nomAppli,
     data: [consoAppli],
@@ -180,15 +212,28 @@ return config;
 </head>
 <body>
   <div id="chart_div"class="example-wrapper">
+
   </div>
-  <div id="container">
-  </div>
+<label id="hostConsoMoyenne"></label><br>
+<label> Exportation :     Nombre d'heures par jour </label>
+<input type="number" id="heures">
+<label>  Sur : </label>
+<input type="number" id="nbJours">
+<label>  par an.   </label>
+  <label id="resultat"></label>
   {% for mesure in tableauFinal %}
 
   {% if mesure.name != mesurePrec %}
   <div id={{mesure.name}}>
     <canvas id="{{mesure.name}}1"></canvas>
-    <label id="{{mesure.name}}Label">
+    <label id="{{mesure.name}}Label"></label>
+    <label id="{{mesure.name}}Moyenne"></label><br>
+    <label> Exportation :     Nombre d'heures par jour </label>
+    <input type="number" id="{{mesure.name}}Heures">
+    <label>  Sur : </label>
+    <input type="number" id="{{mesure.name}}NbJours">
+    <label>  par an.    </label>
+    <label id="{{mesure.name}}Resultat"></label>
   </div>
   {% set mesurePrec = mesure.name %}
   {% endif %}
@@ -198,6 +243,5 @@ return config;
     determinerAffichage("{{mesure.name}}",{{mesure.conso}}, {{mesure.heure}});
   </script>
   {% endfor %}
-
 </body>
 {% endblock %}
