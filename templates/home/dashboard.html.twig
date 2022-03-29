@@ -88,7 +88,6 @@ function determinerAffichage (nomMesure, consoMesure, dateMesure)
         {
           nomFonctionPrec=nomMesure;
         }
-        else{}
         if(nomMesure==nomFonctionPrec)
         {
           if(boolPremiereMesure==0)
@@ -96,18 +95,32 @@ function determinerAffichage (nomMesure, consoMesure, dateMesure)
             premiereMesure=dateMesure;
             boolPremiereMesure=1;
           }
+          else {
+            derniereMesure = dateMesure;
+          }
           mesureTotale= mesureTotale + consoMesure;
-          derniereMesure = dateMesure;
+
         }
         else {
-          {
 
-              différenceTmps = (derniereMesure-premiereMesure);
-              alert(nomMesure+" : "+mesureTotale*Math.pow(10,-6));
-              consoTotale =mesureTotale*Math.pow(10,-6)*différenceTmps;
-              config = determinerVariables(nomMesure, consoTotale);
-              const myChart = new Chart (document.getElementById(nomMesure+'1'),config);
-              nomFonctionPrec='';
+                différenceTmps = (derniereMesure-premiereMesure);
+                mesureTotale = mesureTotale*Math.pow(10,-6);
+                //mesureTotale = Math.round(mesureTotale*10000)/10000;
+                //alert(nomFonctionPrec+" : "+mesureTotale+" "+différenceTmps);
+
+                consoTotale =mesureTotale*Math.pow(10,-6)*différenceTmps;
+                if (consoTotale > 0)
+                {
+                  config = determinerVariables(nomFonctionPrec, consoTotale);
+                  const myChart = new Chart (document.getElementById(nomFonctionPrec+'1'),config);
+                }
+                else
+                {
+                  document.getElementById(nomFonctionPrec+'Label').innerHTML = ("Pas de mesures significatives pour le processus : " + nomFonctionPrec);
+                }
+
+
+              nomFonctionPrec=nomMesure;
               mesureTotale = 0;
               derniereMesure = 0;
               boolPremiereMesure =0;
@@ -115,12 +128,26 @@ function determinerAffichage (nomMesure, consoMesure, dateMesure)
               différenceTmps=0;
           }
         }
-      }
 function determinerVariables (nomAppli,consoAppli)
 {
 
+if (consoAppli<100)
+{
+  if(consoAppli < 1)
+  {
+    grandeur = "MicroWattsHeure"
+    consoAppli = consoAppli*1000000;
+  }
+  else
+  {
+    grandeur = "MilliWattsHeure"
+    consoAppli = consoAppli*1000;
+  }
+
+}
+
 const data = {
-  labels: '  ',
+  labels: ["WattsHeure"],
   datasets: [{
     label: nomAppli,
     data: [consoAppli],
@@ -161,14 +188,16 @@ return config;
   {% if mesure.name != mesurePrec %}
   <div id={{mesure.name}}>
     <canvas id="{{mesure.name}}1"></canvas>
+    <label id="{{mesure.name}}Label">
   </div>
   {% set mesurePrec = mesure.name %}
   {% endif %}
 
 
   <script>
-  determinerAffichage("{{mesure.name}}",{{mesure.conso}}, {{mesure.heure}});
+    determinerAffichage("{{mesure.name}}",{{mesure.conso}}, {{mesure.heure}});
   </script>
   {% endfor %}
+
 </body>
 {% endblock %}
