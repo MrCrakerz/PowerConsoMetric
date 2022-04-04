@@ -41,27 +41,6 @@
     return time;
   }
 
-/*  function drawChart(nomMesure, consoMesure)
-   {
-            // Define the chart to be drawn.
-            var data = google.visualization.arrayToDataTable([
-               ['Year', 'Asia'],
-               ['2012',  900],
-               ['2013',  1000],
-               ['2014',  1170],
-               ['2015',  1250],
-               ['2016',  1530]
-            ]);
-
-            var options = {title: 'Population (in millions)'};
-
-            // Instantiate and draw the chart.
-            var chart = new google.visualization.ColumnChart(document.getElementById(nomMesure));
-            chart.draw(data, options);
-         }
-
-         google.charts.setOnLoadCallback(drawChart);
-*/
 
 function drawBackgroundColor()
 {
@@ -209,56 +188,176 @@ return config;
 function calculerExportationHote()
 {
   valeurMoyenne = Number(document.getElementById('hostConsoMoyenne').textContent);
-  alert ('valMoy : ' + valeurMoyenne);
+  //alert ('valMoy : ' + valeurMoyenne);
   valeurMoyenne = valeurMoyenne*Math.pow(10,-3);
   nbHeure = document.getElementById('heures').value;
-  alert ('nbHeure : ' + nbHeure);
+  //alert ('nbHeure : ' + nbHeure);
   nbJours = document.getElementById('nbJours').value;
-  alert (' nbJours ' + nbJours);
+  //alert (' nbJours ' + nbJours);
   valExport = valeurMoyenne * nbHeure * nbJours;
-  alert (' ValeExpor : ' + valExport);
+  valExport= Math.round(valExport*Math.pow(10,6))*Math.pow(10,-6);
+  //alert (' ValeExpor : ' + valExport);
   document.getElementById('resultat').innerHTML=valExport;
+  document.getElementById('grandeur').innerHTML="wH";
+}
+function calculerComparaison(valeur)
+{
+  valeurExportee = Number(document.getElementById('resultat').textContent);
+  alert ( valeurExportee);
+  if (valeur == "velo")
+  {
+   tempsAlimenterVelo = valeurExportee*14.4/0.3;
+   if (tempsAlimenterVelo > 3600)
+   {
+     tempsAlimenterVelo = tempsAlimenterVelo / 3600;
+     tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+     document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+tempsAlimenterVelo+" heures.");
+
+   }
+   else if (tempsAlimenterVelo > 60)
+   {
+     tempsAlimenterVelo = tempsAlimenterVelo/60;
+     document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+tempsAlimenterVelo+" minutes.");
+     tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+
+   }
+   else {
+     alert (tempsAlimenterVelo);
+     document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+tempsAlimenterVelo+" secondes.");
+     tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+   }
+  }
+  else if (valeur=="coeur") {
+    tempsAlimenterVelo = valeurExportee*9/0.3;
+    if (tempsAlimenterVelo > 1440)
+    {
+      tempsAlimenterVelo = tempsAlimenterVelo / 1440;
+      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+      document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie par un coeur pour battre environ "+tempsAlimenterVelo+" jours.");
+
+    }
+    else if (tempsAlimenterVelo > 60)
+    {
+      tempsAlimenterVelo = tempsAlimenterVelo/60;
+      document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie par un coeur pour battre environ "+tempsAlimenterVelo+" heures.");
+      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+
+    }
+    else {
+      alert (tempsAlimenterVelo);
+      document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie par un coeur pour battre environ "+tempsAlimenterVelo+" minutes.");
+      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+    }
+  }
+}
+function calculerComparaisonConsu(valeur, nom)
+{
+  valeurExportee = Number(document.getElementById(nom+'Resultat').textContent);
+  alert ( valeurExportee);
+  if (valeur == "velo")
+  {
+   tempsAlimenterVelo = valeurExportee*14.4/0.3;
+   labelResultat = document.getElementById(nom+'Comparaison');
+   if (tempsAlimenterVelo > 3600)
+   {
+     tempsAlimenterVelo = tempsAlimenterVelo / 3600;
+     tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+     labelResultat.innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+tempsAlimenterVelo+" heures.");
+
+   }
+   else if (tempsAlimenterVelo > 60)
+   {
+     tempsAlimenterVelo = tempsAlimenterVelo/60;
+     dolabelResultat.innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+tempsAlimenterVelo+" minutes.");
+     tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+
+   }
+   else {
+     alert (tempsAlimenterVelo);
+     labelResultat.innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+tempsAlimenterVelo+" secondes.");
+     tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+   }
+  }
+  else if (valeur=="coeur") {
+    tempsAlimenterVelo = valeurExportee*9/0.3;
+    if (tempsAlimenterVelo > 1440)
+    {
+      tempsAlimenterVelo = tempsAlimenterVelo / 1440;
+      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+      labelResultat.innerHTML=("Cette consommation est égale à l'énergie par un coeur pour battre environ "+tempsAlimenterVelo+" jours.");
+
+    }
+    else if (tempsAlimenterVelo > 60)
+    {
+      tempsAlimenterVelo = tempsAlimenterVelo/60;
+      labelResultat.innerHTML=("Cette consommation est égale à l'énergie par un coeur pour battre environ "+tempsAlimenterVelo+" heures.");
+      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+
+    }
+    else {
+      alert (tempsAlimenterVelo);
+      labelResultat.innerHTML=("Cette consommation est égale à l'énergie par un coeur pour battre environ "+tempsAlimenterVelo+" minutes.");
+      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+    }
+  }
 }
   </script>
 
 </head>
 <body>
   <form id = "hostFormulaire">
-  <div id="chart_div"class="example-wrapper">
-
-  </div>
-<label> Moyenne de la consommation instantané globale : </label>
-<label type=number id="hostConsoMoyenne"></label>
-<label> MilliWatts </label> <br>
-<label> Exportation :     Nombre d'heures par jour </label>
-<input type="number" id="heures">
-<label>  Sur : </label>
-<input type="number" id="nbJours">
-<label>  par an.   </label>
-  <label id="resultat"></label>
-  <input type = 'button' value="calculer" onclick= "calculerExportationHote()">
-</form>
-  {% for mesure in tableauFinal %}
-
-  {% if mesure.name != mesurePrec %}
-  <div id={{mesure.name}}>
-    <canvas id="{{mesure.name}}1"></canvas>
-    <label id="{{mesure.name}}Label"></label>
-    <label id="{{mesure.name}}Moyenne"></label><br>
-    <label> Exportation :     Nombre d'heures par jour </label>
-    <input type="number" id="{{mesure.name}}Heures">
-    <label>  Sur : </label>
-    <input type="number" id="{{mesure.name}}NbJours">
-    <label>  par an.    </label>
-    <label id="{{mesure.name}}Resultat"></label>
-  </div>
-  {% set mesurePrec = mesure.name %}
-  {% endif %}
-
-
-  <script>
-    determinerAffichage("{{mesure.name}}",{{mesure.conso}}, {{mesure.heure}});
-  </script>
-  {% endfor %}
+    <div id="chart_div"class="example-wrapper">
+    </div>
+    <center>
+      <label> Moyenne de la consommation instantané globale : </label>
+      <label type=number id="hostConsoMoyenne"></label>
+      <label> MilliWatts </label> <br>
+      <label> Exportation :     Nombre d'heures par jour </label>
+      <input type="number" id="heures">
+      <label>  Sur : </label>
+      <input type="number" id="nbJours">
+      <label>  par an.   </label><br>
+      <input type = 'button' value="calculer" onclick= "calculerExportationHote()">
+      <br>
+      <label> Resultat : </label>
+      <label id="resultat"></label>
+      <label id="grandeur"></label><br>
+      <label> Comparer la consommation avec : </label>
+      <select onChange="calculerComparaison(this.value)">
+        <option value="velo">Temps et distance parcourue en vélo</option>
+        <option value="coeur"> Temps et nombre de battements d'un coeur</option>
+      </select>
+      <label id ="comparaison"></label><br>
+    </center>
+  </form>
+    {% for mesure in tableauFinal %}
+      {% if mesure.name != mesurePrec %}
+      <div id={{mesure.name}} style="height : 650px">
+        <canvas id="{{mesure.name}}1" ></canvas>
+        <center>
+          <label id="{{mesure.name}}Label"></label>
+          <label id="{{mesure.name}}Moyenne"></label><br>
+          <label> Exportation :     Nombre d'heures par jour </label>
+          <input type="number" id="{{mesure.name}}Heures">
+          <label>  Sur : </label>
+          <input type="number" id="{{mesure.name}}NbJours">
+          <label>  par an.    </label>
+          <input type = 'button' value="calculer" onclick= "calculerExportationConsu()">
+          <label id="{{mesure.name}}Resultat"></label>
+          <label id="{{mesure.name}}Grandeur"></label><br>
+          <label> Comparer la consommation avec : </label>
+          <select onChange=calculerComparaisonConsu(this.value,"{{mesure.name}}")>
+            <option value="velo">Temps et distance parcourue en vélo</option>
+            <option value="coeur"> Temps et nombre de battements d'un coeur</option>
+          </select>
+          <label id ="{{mesure.name}}Comparaison"></label><br>
+        </center>
+      </div>
+        {% set mesurePrec = mesure.name %}
+      {% endif %}
+    <script>
+      determinerAffichage("{{mesure.name}}",{{mesure.conso}}, {{mesure.heure}});
+    </script>
+    {% endfor %}
 </body>
 {% endblock %}
