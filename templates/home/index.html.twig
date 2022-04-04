@@ -2,17 +2,23 @@
 
 {% block title %}Hello HomeController!{% endblock %}
 
+{% block javascripts %}
+<script type="text/javascript">
+function sub() {
+    document.getElementById("importeur").submit();
+};
+</script>
+{% endblock %}
+
 {% block body %}
-<form action="{{ path('do-upload') }}" method="post" enctype="multipart/form-data">
+  <h1>Pour commencer, importez votre fichier Scaphandre :</h1>
+  <form id="importeur" action="{{ path('do-upload') }}" method="post" enctype="multipart/form-data">
 
         <input type="hidden" name="token" value="{{ csrf_token('upload') }}" />
 
-        <div>
-            <label for="myfile">File to upload:</label>
-            <input type="file" name="myfile" id="myfile">
+        <div class="centrer">
+            <input id="file_import" type="file" name="myfile" id="myfile" onchange="sub()">
         </div>
-
-        <button type="submit">Send</button>
 
   </form>
 {% endblock %}

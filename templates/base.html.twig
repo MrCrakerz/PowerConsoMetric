@@ -7,6 +7,10 @@
         {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
+            <link rel="stylesheet" href="/css/master.css">
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
         {% endblock %}
 
         {% block javascripts %}
@@ -14,6 +18,19 @@
         {% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+        <section class="layout">
+          <div class="header">
+            <a id="header_logo" href="https://127.0.0.1:8000/">
+              <img src="/images/logo_long_white.png" alt="logo_header">
+            </a>
+          </div>
+          <div class="leftSide"></div>
+          <div class="body">
+            {% block body %}
+            {% endblock %}
+          </div>
+          <div class="rightSide"></div>
+          <div class="footer"></div>
+        </section>
     </body>
 </html>
