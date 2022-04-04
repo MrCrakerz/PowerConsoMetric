@@ -251,19 +251,19 @@ function calculerComparaison(valeur)
     {
       tempsAlimenterVelo = tempsAlimenterVelo / 1440;
       tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
-      document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie par un coeur pour battre environ "+tempsAlimenterVelo+" jours.");
+      document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+tempsAlimenterVelo+" jours.");
 
     }
     else if (tempsAlimenterVelo > 60)
     {
       tempsAlimenterVelo = tempsAlimenterVelo/60;
-      document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie par un coeur pour battre environ "+tempsAlimenterVelo+" heures.");
+      document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+tempsAlimenterVelo+" heures.");
       tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
 
     }
     else {
       alert (tempsAlimenterVelo);
-      document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie par un coeur pour battre environ "+tempsAlimenterVelo+" minutes.");
+      document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+tempsAlimenterVelo+" minutes.");
       tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
     }
   }
