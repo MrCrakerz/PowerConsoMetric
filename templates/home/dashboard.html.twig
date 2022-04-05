@@ -27,11 +27,6 @@
   google.charts.load('current', {packages: ['corechart', 'line']});
   google.charts.setOnLoadCallback(drawBackgroundColor)
 
-  function removeSpecialChars(str) {
-    return str.replace(/(?!\w|\s)./g, '')
-      .replace(/\s+/g, ' ')
-      .replace(/^(\s*)([\W\w]*)(\b\s*$)/g, '$2');
-  }
   function timeConverter(UNIX_timestamp){
     var a = new Date(UNIX_timestamp * 1000);
     var hour = a.getHours();
@@ -54,11 +49,12 @@ function drawBackgroundColor()
         {%endfor%}
       ]);
       compteurHost = 0;
+      mesureTotale=0;
       {%for mesure in tableauHote%}
-      mesureToale = mesureTotale + {{mesure.conso}};
+      mesureTotale = mesureTotale + {{mesure.conso}}*Math.pow(10,-6);
       compteurHost ++;
     {%endfor%}
-    mesureTotale = mesureToale*Math.pow(10,-3);
+    //mesureTotale = mesureToale*Math.pow(10,-3);
     moyenneHost = mesureTotale/compteurHost;
     document.getElementById("hostConsoMoyenne").innerHTML = moyenneHost;
 
@@ -78,7 +74,6 @@ function drawBackgroundColor()
 
 function determinerAffichage (nomMesure, consoMesure, dateMesure)
       {
-        //nomMesure = removeSpecialChars(nomMesure);
         if (nomFonctionPrec=="")
         {
           nomFonctionPrec=nomMesure;
@@ -104,20 +99,10 @@ function determinerAffichage (nomMesure, consoMesure, dateMesure)
                 mesureTotale = mesureTotale*Math.pow(10,-6);
                 //mesureTotale = Math.round(mesureTotale*10000)/10000;
                 //alert(nomFonctionPrec+" : "+mesureTotale+" "+différenceTmps);
-
                 consoTotale =mesureTotale*différenceTmps/compteurMoyenne;
 
                 consoMoyenne= mesureTotale/compteurMoyenne;
-                document.getElementById(nomFonctionPrec+'Moyenne').innerHTML = ("Moyenne de la consommation pour le processus " + nomFonctionPrec+" : " + consoMoyenne*Math.pow(10,3) +" MilliWatts.");
-
-                /*tableauMoyenne= tableauMoyenne + {
-                  compteurMesureMoyenneActuelle:{
-                    "nom":nomFonctionPrec,
-                    "consoMoyenne":consoMoyenne
-                  }
-                };*/
-
-
+                //document.getElementById(nomFonctionPrec+'Moyenne').innerHTML = ("Moyenne de la consommation pour le processus " + nomFonctionPrec+" : " + consoMoyenne*Math.pow(10,3) +" Watts.");
                 if (consoTotale > 0)
                 {
                   config = determinerVariables(nomFonctionPrec, consoTotale);
@@ -128,6 +113,7 @@ function determinerAffichage (nomMesure, consoMesure, dateMesure)
                 else
                 {
                   document.getElementById(nomFonctionPrec+'Label').innerHTML = ("Pas de mesures significatives pour le processus : " + nomFonctionPrec);
+                  document.getElementById(nomFonctionPrec).remove();
                 }
 
               compteurMesureMoyenneActuelle;
@@ -142,51 +128,51 @@ function determinerAffichage (nomMesure, consoMesure, dateMesure)
 
         }
 function determinerVariables (nomAppli,consoAppli)
-{
+  {
 
-if (consoAppli<1)
-{
-  grandeur = "MilliWattsHeure"
-  consoAppli = consoAppli*1000;
+  if (consoAppli<1)
+  {
+    grandeur = "MilliWattsHeure"
+    consoAppli = consoAppli*1000;
 
-}
-else if (consoAppli > 1000) {
+  }
+  else if (consoAppli > 1000) {
 
-  grandeur = "KiloWattsHeure"
-  consoAppli = consoAppli/1000;
-}
-else {
-  grandeur = "WattsHeure"
-}
-
-const data = {
-  labels: [grandeur],
-  datasets: [{
-    label: nomAppli,
-    data: [consoAppli],
-    backgroundColor: [
-      'rgba(255, 99, 132, 0.2)'
-    ],
-    borderColor: [
-      'rgb(255, 99, 132)'
-    ],
-    borderWidth: 1
-  }]
-};
-
-const config = {
-type: 'bar',
-data: data,
-options: {
-  scales: {
-    y: {
-      beginAtZero: true
-      }
+      grandeur = "KiloWattsHeure"
+      consoAppli = consoAppli/1000;
     }
-  },
-};
-return config;
-}
+    else {
+      grandeur = "WattsHeure"
+    }
+
+    const data = {
+      labels: [grandeur],
+      datasets: [{
+        label: nomAppli,
+        data: [consoAppli],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)'
+        ],
+        borderColor: [
+          'rgb(255, 99, 132)'
+        ],
+        borderWidth: 1
+      }]
+    };
+
+    const config = {
+    type: 'bar',
+    data: data,
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+          }
+        }
+      },
+  };
+  return config;
+  }
 function calculerExportationHote()
 {
   valeurMoyenne = Number(document.getElementById('hostConsoMoyenne').textContent);
@@ -204,7 +190,7 @@ function calculerExportationHote()
 }
 function calculerExportationConsu(nom)
 {
-  alert(document.getElementById(nom+'Moyenne').textContent);
+  //alert(document.getElementById(nom+'Moyenne').textContent);
   valeurMoyenne = Number(document.getElementById(nom+'Moyenne').textContent);
   alert ('valMoy : ' + valeurMoyenne);
   valeurMoyenne = valeurMoyenne*Math.pow(10,-3);
@@ -221,7 +207,7 @@ function calculerExportationConsu(nom)
 function calculerComparaison(valeur)
 {
   valeurExportee = Number(document.getElementById('resultat').textContent);
-  alert ( valeurExportee);
+  //alert ( valeurExportee);
   if (valeur == "velo")
   {
    tempsAlimenterVelo = valeurExportee*14.4/0.3;
@@ -291,7 +277,7 @@ function calculerComparaisonConsu(valeur, nom)
 
    }
    else {
-     alert (tempsAlimenterVelo);
+     //alert (tempsAlimenterVelo);
      labelResultat.innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+tempsAlimenterVelo+" secondes.");
      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
    }
@@ -329,7 +315,7 @@ function calculerComparaisonConsu(valeur, nom)
     <center>
       <label> Moyenne de la consommation instantané globale : </label>
       <label type=number id="hostConsoMoyenne"></label>
-      <label> MilliWatts </label> <br>
+      <label> Watts </label> <br>
       <label> Exportation :     Nombre d'heures par jour </label>
       <input type="number" id="heures">
       <label>  Sur : </label>
@@ -355,7 +341,7 @@ function calculerComparaisonConsu(valeur, nom)
         <center>
           <label id="{{mesure.name}}Label"></label>
           <label id="{{mesure.name}}Moyenne"></label>
-          <label> MilliWatts </label> <br>
+          <label> Watts </label> <br>
           <label> Exportation :     Nombre d'heures par jour </label>
           <input type="number" id="{{mesure.name}}Heures">
           <label>  Sur : </label>
