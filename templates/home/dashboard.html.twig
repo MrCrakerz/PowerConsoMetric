@@ -77,7 +77,6 @@ function determinerAffichage (nomMesure, consoMesure, dateMesure)
         if (nomFonctionPrec=="")
         {
           nomFonctionPrec=nomMesure;
-          compteurMoyenne=1;
         }
         if(nomMesure==nomFonctionPrec)
         {
@@ -85,6 +84,7 @@ function determinerAffichage (nomMesure, consoMesure, dateMesure)
           {
             premiereMesure=dateMesure;
             boolPremiereMesure=1;
+            compteurMoyenne=1;
           }
           else {
             derniereMesure = dateMesure;
@@ -94,15 +94,24 @@ function determinerAffichage (nomMesure, consoMesure, dateMesure)
 
         }
         else {
-
+                //tmps en millisecondes
                 différenceTmps = (derniereMesure-premiereMesure);
-                mesureTotale = mesureTotale*Math.pow(10,-6);
-                //mesureTotale = Math.round(mesureTotale*10000)/10000;
-                //alert(nomFonctionPrec+" : "+mesureTotale+" "+différenceTmps);
-                consoTotale =mesureTotale*différenceTmps/compteurMoyenne;
 
-                consoMoyenne= mesureTotale/compteurMoyenne;
-                //document.getElementById(nomFonctionPrec+'Moyenne').innerHTML = ("Moyenne de la consommation pour le processus " + nomFonctionPrec+" : " + consoMoyenne*Math.pow(10,3) +" Watts.");
+                if (différenceTmps>0)
+                {
+                  //alert (différenceTmps);
+                  //mesure totale en watts
+                  mesureTotale = mesureTotale*Math.pow(10,-6);
+                  //tmps en heures
+                  différenceTmps = Math.round(différenceTmps*Math.pow(2.7778,-7));
+                  //mesureTotale = Math.round(mesureTotale*10000)/10000;
+                  //alert(nomFonctionPrec+" : "+mesureTotale+" "+différenceTmps);
+                  consoTotale =mesureTotale*différenceTmps/compteurMoyenne;
+                  //alert(consoTotale);
+                  consoMoyenne= mesureTotale/compteurMoyenne;
+                  //document.getElementById(nomFonctionPrec+'Moyenne').innerHTML = ("Moyenne de la consommation pour le processus " + nomFonctionPrec+" : " + consoMoyenne*Math.pow(10,3) +" Watts.");
+                }
+
                 if (consoTotale > 0)
                 {
                   config = determinerVariables(nomFonctionPrec, consoTotale);
@@ -112,7 +121,7 @@ function determinerAffichage (nomMesure, consoMesure, dateMesure)
                 }
                 else
                 {
-                  document.getElementById(nomFonctionPrec+'Label').innerHTML = ("Pas de mesures significatives pour le processus : " + nomFonctionPrec);
+                  //document.getElementById(nomFonctionPrec+'Label').innerHTML = ("Pas de mesures significatives pour le processus : " + nomFonctionPrec);
                   document.getElementById(nomFonctionPrec).remove();
                 }
 
@@ -202,7 +211,7 @@ function calculerExportationConsu(nom)
   valExport= Math.round(valExport*Math.pow(10,6))*Math.pow(10,-6);
   alert (' ValeExpor : ' + valExport);
   document.getElementById(nom+'Resultat').innerHTML=valExport;
-  document.getElementById(nom+'Grandeur').innerHTML="wH";
+  document.getElementById(nom+'Grandeur').innerHTML="MilliWattsHeures";
 }
 function calculerComparaison(valeur)
 {
@@ -211,24 +220,22 @@ function calculerComparaison(valeur)
   if (valeur == "velo")
   {
    tempsAlimenterVelo = valeurExportee*14.4/0.3;
+  distanceParcourueVelo = Math.round(tempsAlimenterVelo/3600*15);
    if (tempsAlimenterVelo > 3600)
    {
      tempsAlimenterVelo = tempsAlimenterVelo / 3600;
-     tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
-     document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+tempsAlimenterVelo+" heures.");
+     document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+Math.round(tempsAlimenterVelo)+" heures et faire "+distanceParcourueVelo+" km.");
 
    }
    else if (tempsAlimenterVelo > 60)
    {
      tempsAlimenterVelo = tempsAlimenterVelo/60;
-     document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+tempsAlimenterVelo+" minutes.");
-     tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+     document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+Math.round(tempsAlimenterVelo)+" minutes et faire "+distanceParcourueVelo+" km.");
 
    }
    else {
      alert (tempsAlimenterVelo);
-     document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+tempsAlimenterVelo+" secondes.");
-     tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+     document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+Math.round(tempsAlimenterVelo)+" secondes.");
    }
   }
   else if (valeur=="coeur") {
@@ -236,21 +243,20 @@ function calculerComparaison(valeur)
     if (tempsAlimenterVelo > 1440)
     {
       tempsAlimenterVelo = tempsAlimenterVelo / 1440;
-      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
-      document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+tempsAlimenterVelo+" jours.");
+      document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+Math.round(tempsAlimenterVelo)+" jours.");
 
     }
     else if (tempsAlimenterVelo > 60)
     {
       tempsAlimenterVelo = tempsAlimenterVelo/60;
-      document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+tempsAlimenterVelo+" heures.");
-      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+      document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+Math.round(tempsAlimenterVelo)+" heures.");
+
 
     }
     else {
       alert (tempsAlimenterVelo);
-      document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+tempsAlimenterVelo+" minutes.");
-      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+      document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+Math.round(tempsAlimenterVelo)+" minutes.");
+
     }
   }
 }
@@ -260,47 +266,48 @@ function calculerComparaisonConsu(valeur, nom)
   alert ( valeurExportee);
   if (valeur == "velo")
   {
-   tempsAlimenterVelo = valeurExportee*14.4/0.3;
+   tempsAlimenterVelo = valeurExportee*Math.pow(10,-3)*14.4/0.3;
+   distanceParcourueVelo = Math.round(tempsAlimenterVelo/3600*15);
    labelResultat = document.getElementById(nom+'Comparaison');
    if (tempsAlimenterVelo > 3600)
    {
      tempsAlimenterVelo = tempsAlimenterVelo / 3600;
      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
-     labelResultat.innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+tempsAlimenterVelo+" heures.");
+     labelResultat.innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+Math.round(tempsAlimenterVelo)+" heures et faire "+distanceParcourueVelo+" km.");
 
    }
    else if (tempsAlimenterVelo > 60)
    {
      tempsAlimenterVelo = tempsAlimenterVelo/60;
-     dolabelResultat.innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+tempsAlimenterVelo+" minutes.");
+     labelResultat.innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+Math.round(tempsAlimenterVelo)+" minutes et faire "+distanceParcourueVelo+" km.");
      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
 
    }
    else {
      //alert (tempsAlimenterVelo);
-     labelResultat.innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+tempsAlimenterVelo+" secondes.");
+     labelResultat.innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+Math.round(tempsAlimenterVelo)+" secondes.");
      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
    }
   }
   else if (valeur=="coeur") {
-    tempsAlimenterVelo = valeurExportee*9/0.3;
+    tempsAlimenterVelo = valeurExportee*Math.pow(10,-3)*9/0.3;
     if (tempsAlimenterVelo > 1440)
     {
       tempsAlimenterVelo = tempsAlimenterVelo / 1440;
       tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
-      labelResultat.innerHTML=("Cette consommation est égale à l'énergie par un coeur pour battre environ "+tempsAlimenterVelo+" jours.");
+      labelResultat.innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+Math.round(tempsAlimenterVelo)+" jours.");
 
     }
     else if (tempsAlimenterVelo > 60)
     {
       tempsAlimenterVelo = tempsAlimenterVelo/60;
-      labelResultat.innerHTML=("Cette consommation est égale à l'énergie par un coeur pour battre environ "+tempsAlimenterVelo+" heures.");
+      labelResultat.innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+Math.round(tempsAlimenterVelo)+" heures.");
       tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
 
     }
     else {
       alert (tempsAlimenterVelo);
-      labelResultat.innerHTML=("Cette consommation est égale à l'énergie par un coeur pour battre environ "+tempsAlimenterVelo+" minutes.");
+      labelResultat.innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+Math.round(tempsAlimenterVelo)+" minutes.");
       tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
     }
   }
@@ -341,7 +348,7 @@ function calculerComparaisonConsu(valeur, nom)
         <center>
           <label id="{{mesure.name}}Label"></label>
           <label id="{{mesure.name}}Moyenne"></label>
-          <label> Watts </label> <br>
+          <label> MilliWatts </label> <br>
           <label> Exportation :     Nombre d'heures par jour </label>
           <input type="number" id="{{mesure.name}}Heures">
           <label>  Sur : </label>
