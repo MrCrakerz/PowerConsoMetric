@@ -55,12 +55,12 @@ function drawBackgroundColor()
       compteurHost ++;
     {%endfor%}
     //mesureTotale = mesureToale*Math.pow(10,-3);
-    moyenneHost = mesureTotale/compteurHost;
+    moyenneHost = Math.round(mesureTotale/compteurHost*100)/100;
     document.getElementById("hostConsoMoyenne").innerHTML = moyenneHost;
 
       var options = {
         hAxis: {
-          title: 'Time'
+          title: 'Temps'
         },
         vAxis: {
           title: 'Puissance (watts)'
@@ -117,7 +117,7 @@ function determinerAffichage (nomMesure, consoMesure, dateMesure)
                   config = determinerVariables(nomFonctionPrec, consoTotale);
                   const myChart = new Chart (document.getElementById(nomFonctionPrec+'1'),config);
                   document.getElementById(nomFonctionPrec+'Label').innerHTML = ("Moyenne de la consommation pour le processus " + nomFonctionPrec+" : ");
-                    document.getElementById(nomFonctionPrec+'Moyenne').innerHTML = (consoMoyenne*Math.pow(10,3));
+                    document.getElementById(nomFonctionPrec+'Moyenne').innerHTML = Math.round(consoMoyenne*Math.pow(10,3)*100)/100;
                 }
                 else
                 {
@@ -195,7 +195,16 @@ function calculerExportationHote()
   valExport= Math.round(valExport*Math.pow(10,6))*Math.pow(10,-6);
   //alert (' ValeExpor : ' + valExport);
   document.getElementById('resultat').innerHTML=valExport;
-  document.getElementById('grandeur').innerHTML="wH";
+  prix = Math.round(valExport * 0.174*100)/100;
+  document.getElementById('grandeur').innerHTML="KwH";
+  document.getElementById('prix').innerHTML=("      Prix : "+prix+" €.");
+  if (valExport > 1 )
+  {
+    calculerComparaison("voiture");
+  }
+  else {
+    calculerComparaison("velo");
+  }
 }
 function calculerExportationConsu(nom)
 {
@@ -203,15 +212,29 @@ function calculerExportationConsu(nom)
   valeurMoyenne = Number(document.getElementById(nom+'Moyenne').textContent);
   //alert ('valMoy : ' + valeurMoyenne);
   valeurMoyenne = valeurMoyenne*Math.pow(10,-3);
+
   nbHeure = document.getElementById(nom+'Heures').value;
   //alert ('nbHeure : ' + nbHeure);
   nbJours = document.getElementById(nom+'NbJours').value;
   //alert (' nbJours ' + nbJours);
   valExport = valeurMoyenne * nbHeure * nbJours;
-  valExport= Math.round(valExport*Math.pow(10,6))*Math.pow(10,-6);
+  //alert (' ValeExpor : ' + valExport);
+  if (valExport>1000)
+  {
+    valExport=valExport*Math.pow(10,-3);
+    grandeur = "KiloWattsHeures"
+  }
+  else if (valExport < 1) {
+    valExport=valExport*Math.pow(10,3);
+    grandeur = "MilliWattsHeures"
+  }
+  else {
+    grandeur= "WattsHeures"
+  }
+  valExport= Math.round(valExport*100)/100;
   //alert (' ValeExpor : ' + valExport);
   document.getElementById(nom+'Resultat').innerHTML=valExport;
-  document.getElementById(nom+'Grandeur').innerHTML="MilliWattsHeures";
+  document.getElementById(nom+'Grandeur').innerHTML=grandeur;
 }
 function calculerComparaison(valeur)
 {
@@ -219,26 +242,11 @@ function calculerComparaison(valeur)
   //alert ( valeurExportee);
   if (valeur == "velo")
   {
-   tempsAlimenterVelo = valeurExportee*14.4/0.3;
-  distanceParcourueVelo = Math.round(tempsAlimenterVelo/3600*15);
-   if (tempsAlimenterVelo > 3600)
-   {
-     tempsAlimenterVelo = tempsAlimenterVelo / 3600;
-     document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+Math.round(tempsAlimenterVelo)+" heures et faire "+distanceParcourueVelo+" km.");
-
-   }
-   else if (tempsAlimenterVelo > 60)
-   {
-     tempsAlimenterVelo = tempsAlimenterVelo/60;
-     document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+Math.round(tempsAlimenterVelo)+" minutes et faire "+distanceParcourueVelo+" km.");
-
-   }
-   else {
-     alert (tempsAlimenterVelo);
-     document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+Math.round(tempsAlimenterVelo)+" secondes.");
-   }
+    distanceParcourueVelo = Math.round(valeurExportee/0.0072);
+      document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie nécessaire pour faire "+distanceParcourueVelo+" km en vélo électrique.");
   }
   else if (valeur=="coeur") {
+    valeurExportee = valeurExportee*1000;
     tempsAlimenterVelo = valeurExportee*9/0.3;
     if (tempsAlimenterVelo > 1440)
     {
@@ -254,52 +262,44 @@ function calculerComparaison(valeur)
 
     }
     else {
-      alert (tempsAlimenterVelo);
+    //  alert (tempsAlimenterVelo);
       document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+Math.round(tempsAlimenterVelo)+" minutes.");
 
     }
   }
-  /*else if (valeur=="voiture") {
-    tempsAlimenterVelo = valeurExportee*Math.pow(10,-3)/8500;
-    distanceVoiture = tempsAlimenterVelo * 50;
-    alert (tempsAlimenterVelo);
-  }*/
+  else if (valeur=="voiture") {
+    distanceVoiture = valeurExportee*100/17;
+    //alert (distanceVoiture);
+    alleRetour = Math.round(distanceVoiture/500*10)/10;
+    document.getElementById('comparaison').innerHTML=("Cette consommation est égale à l'énergie utilisée par une voiture électrique pour parcourir environ "+Math.round(distanceVoiture*100)/100+" km, soit "+alleRetour+" trajet(s) Paris-Bordeaux .");
+}
 }
 function calculerComparaisonConsu(valeur, nom)
 {
-  valeurExportee = Number(document.getElementById(nom+'Resultat').textContent);
-  alert ( valeurExportee);
+    if(document.getElementById(nom+'Grandeur').textContent=="MilliWattsHeures")
+    {
+      valeurExportee = Number(document.getElementById(nom+'Resultat').textContent);
+    }
+    else if (document.getElementById(nom+'Grandeur').textContent == "WattsHeures") {
+      valeurExportee = Number(document.getElementById(nom+'Resultat').textContent)*1000;
+    }
+    else {
+        valeurExportee = Number(document.getElementById(nom+'Resultat').textContent)*Math.pow(10,6);
+    }
+  //alert ( valeurExportee);
   if (valeur == "velo")
   {
-   tempsAlimenterVelo = valeurExportee*Math.pow(10,-3)*14.4/0.3;
-   distanceParcourueVelo = Math.round(tempsAlimenterVelo/3600*15);
+
+   distanceParcourueVelo = Math.round(valeurExportee/7200);
    labelResultat = document.getElementById(nom+'Comparaison');
-   if (tempsAlimenterVelo > 3600)
-   {
-     tempsAlimenterVelo = tempsAlimenterVelo / 3600;
-     tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
-     labelResultat.innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+Math.round(tempsAlimenterVelo)+" heures et faire "+distanceParcourueVelo+" km.");
+   labelResultat.innerHTML=("Cette consommation est égale à l'énergie nécessaire pour faire "+distanceParcourueVelo+" km en vélo électrique.");
 
-   }
-   else if (tempsAlimenterVelo > 60)
-   {
-     tempsAlimenterVelo = tempsAlimenterVelo/60;
-     labelResultat.innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+Math.round(tempsAlimenterVelo)+" minutes et faire "+distanceParcourueVelo+" km.");
-     tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
-
-   }
-   else {
-     //alert (tempsAlimenterVelo);
-     labelResultat.innerHTML=("Cette consommation est égale à l'énergie nécessaire pour alimenter un vélo durant environ "+Math.round(tempsAlimenterVelo)+" secondes.");
-     tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
-   }
   }
   else if (valeur=="coeur") {
-    tempsAlimenterVelo = valeurExportee*Math.pow(10,-3)*9/0.3;
+    tempsAlimenterVelo = valeurExportee*9/0.3;
     if (tempsAlimenterVelo > 1440)
     {
       tempsAlimenterVelo = tempsAlimenterVelo / 1440;
-      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
       labelResultat.innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+Math.round(tempsAlimenterVelo)+" jours.");
 
     }
@@ -307,13 +307,10 @@ function calculerComparaisonConsu(valeur, nom)
     {
       tempsAlimenterVelo = tempsAlimenterVelo/60;
       labelResultat.innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+Math.round(tempsAlimenterVelo)+" heures.");
-      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
-
     }
     else {
-      alert (tempsAlimenterVelo);
+      //alert (tempsAlimenterVelo);
       labelResultat.innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+Math.round(tempsAlimenterVelo)+" minutes.");
-      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
     }
   }
   /*else if (valeur=="voiture") {
@@ -352,22 +349,23 @@ function calculerComparaisonConsu(valeur, nom)
       <label> Moyenne de la consommation instantané globale : </label>
       <label type=number id="hostConsoMoyenne"></label>
       <label> Watts </label> <br>
-      <label> Exportation :     Nombre d'heures par jour </label>
+      <label> Extrapolation :     Nombre d'heures par jour </label>
       <input type="number" id="heures">
       <label>  Sur : </label>
       <input type="number" id="nbJours">
-      <label>  par an.   </label><br>
+      <label> jours par an.   </label><br>
       <input type = 'button' value="calculer" onclick= "calculerExportationHote()">
       <br>
-      <label> Resultat : </label>
+      <label> Resultat :          </label>
       <label id="resultat"></label>
       <label id="grandeur"></label><br>
+      <label id ="prix"> </label><br>
       <label> Comparer la consommation avec : </label>
       <select onChange="calculerComparaison(this.value)">
         <option value="velo">Temps et distance parcourue en vélo</option>
-        <option value="coeur"> Temps et nombre de battements d'un coeur</option>
-        <!-- <option value="voiture">Temps et distance parcourue en voiture</option> -->
-      </select>
+        <option value="coeur"> Temps de battements d'un coeur</option>
+        <option value="voiture">Temps et distance parcourue en voiture</option>
+      </select><br>
       <label id ="comparaison"></label><br>
     </center>
   </form>
@@ -379,18 +377,18 @@ function calculerComparaisonConsu(valeur, nom)
           <label id="{{mesure.name}}Label"></label>
           <label id="{{mesure.name}}Moyenne"></label>
           <label> MilliWatts </label> <br>
-          <label> Exportation :     Nombre d'heures par jour </label>
+          <label> Extrapolation :     Nombre d'heures par jour </label>
           <input type="number" id="{{mesure.name}}Heures">
           <label>  Sur : </label>
           <input type="number" id="{{mesure.name}}NbJours">
-          <label>  par an.    </label>
+          <label> jours par an.    </label>
           <input type = "button" value="calculer" onclick= "calculerExportationConsu('{{mesure.name}}')">
           <label id="{{mesure.name}}Resultat"></label>
           <label id="{{mesure.name}}Grandeur"></label><br>
           <label> Comparer la consommation avec : </label>
           <select onChange=calculerComparaisonConsu(this.value,"{{mesure.name}}")>
             <option value="velo">Temps et distance parcourue en vélo</option>
-            <option value="coeur"> Temps et nombre de battements d'un coeur</option>
+            <option value="coeur"> Temps de battements d'un coeur</option>
           </select>
           <label id ="{{mesure.name}}Comparaison"></label><br>
         </center>
