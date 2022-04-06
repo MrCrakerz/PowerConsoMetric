@@ -201,15 +201,15 @@ function calculerExportationConsu(nom)
 {
   //alert(document.getElementById(nom+'Moyenne').textContent);
   valeurMoyenne = Number(document.getElementById(nom+'Moyenne').textContent);
-  alert ('valMoy : ' + valeurMoyenne);
+  //alert ('valMoy : ' + valeurMoyenne);
   valeurMoyenne = valeurMoyenne*Math.pow(10,-3);
   nbHeure = document.getElementById(nom+'Heures').value;
-  alert ('nbHeure : ' + nbHeure);
+  //alert ('nbHeure : ' + nbHeure);
   nbJours = document.getElementById(nom+'NbJours').value;
-  alert (' nbJours ' + nbJours);
+  //alert (' nbJours ' + nbJours);
   valExport = valeurMoyenne * nbHeure * nbJours;
   valExport= Math.round(valExport*Math.pow(10,6))*Math.pow(10,-6);
-  alert (' ValeExpor : ' + valExport);
+  //alert (' ValeExpor : ' + valExport);
   document.getElementById(nom+'Resultat').innerHTML=valExport;
   document.getElementById(nom+'Grandeur').innerHTML="MilliWattsHeures";
 }
@@ -259,6 +259,11 @@ function calculerComparaison(valeur)
 
     }
   }
+  /*else if (valeur=="voiture") {
+    tempsAlimenterVelo = valeurExportee*Math.pow(10,-3)/8500;
+    distanceVoiture = tempsAlimenterVelo * 50;
+    alert (tempsAlimenterVelo);
+  }*/
 }
 function calculerComparaisonConsu(valeur, nom)
 {
@@ -311,6 +316,30 @@ function calculerComparaisonConsu(valeur, nom)
       tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
     }
   }
+  /*else if (valeur=="voiture") {
+    tempsAlimenterVelo = valeurExportee*Math.pow(10,-3)/8500;
+    distanceVoiture = tempsAlimenterVelo * 50;
+    alert (distanceVoiture);
+    if (tempsAlimenterVelo > 1440)
+    {
+      tempsAlimenterVelo = tempsAlimenterVelo / 1440;
+      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+      labelResultat.innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+Math.round(tempsAlimenterVelo)+" jours.");
+
+    }
+    else if (tempsAlimenterVelo > 60)
+    {
+      tempsAlimenterVelo = tempsAlimenterVelo/60;
+      labelResultat.innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+Math.round(tempsAlimenterVelo)+" heures.");
+      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+
+    }
+    else {
+      alert (tempsAlimenterVelo);
+      labelResultat.innerHTML=("Cette consommation est égale à l'énergie utilisée par un coeur pour battre environ "+Math.round(tempsAlimenterVelo)+" minutes.");
+      tempsAlimenterVelo =Math.round(tempsAlimenterVelo);
+    }
+  }*/
 }
   </script>
 
@@ -337,6 +366,7 @@ function calculerComparaisonConsu(valeur, nom)
       <select onChange="calculerComparaison(this.value)">
         <option value="velo">Temps et distance parcourue en vélo</option>
         <option value="coeur"> Temps et nombre de battements d'un coeur</option>
+        <!-- <option value="voiture">Temps et distance parcourue en voiture</option> -->
       </select>
       <label id ="comparaison"></label><br>
     </center>
